@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SendProductUpdated;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -62,7 +63,7 @@ class CreateProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return $product;
     }
 
     /**
@@ -83,9 +84,18 @@ class CreateProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        $product = Product::find($id);
+        $product->name = $request->name;
+        $product->value = $request->value;
+        $product->quantity = $request->quantity;
+        $product->buy_value = $request->buyValue;
+        $product->percentage = $request->percentage;
+        $product->sell_value = $request->sellValue;
+        $product->save();
+        event(new SendProductUpdated($product));
+        return $product;
     }
 
     /**
@@ -96,7 +106,11 @@ class CreateProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        Product::find($product->id)->delete();
+        return response()->json([
+            'message' => 'Deletado com sucesso',
+            'success' => true
+        ],200);
     }
 
     public function randomCode()
