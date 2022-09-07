@@ -110,7 +110,7 @@ class CreateProductController extends Controller
         return response()->json([
             'message' => 'Deletado com sucesso',
             'success' => true
-        ],200);
+        ], 200);
     }
 
     public function randomCode()
@@ -128,5 +128,12 @@ class CreateProductController extends Controller
             'totalBuy' => $totalBuy,
             'totalQuantity' => $totalQuantity
         ]);
+    }
+
+    public function paginate(Request $request)
+    {
+        $products = Product::orderBy('id', 'DESC')->paginate($request->perPage);
+        Log::debug($request);
+        return $products;
     }
 }
